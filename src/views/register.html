@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html class="h-full bg-gray-50">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://cdn.tailwindcss.com"></script>
+  </head>
+  <body class="h-full font-medium">
+    <div id="container" class="w-full max-w-4xl mx-auto px-4 py-8">
+      <h1 class="text-2xl mb-8 text-center">Account Register</h1>
+      <form id="register" method="post" class="w-full space-y-6 text-lg">
+        <div>
+          <input type="text" name="username" id="username" class="block w-full border px-6 py-4 rounded-full focus:outline-none" placeholder="Username" required />
+        </div>
+        <div>
+          <button id="submit" class="block w-full px-6 py-4 bg-blue-700 hover:bg-blue-900 text-white rounded-full" type="submit">Submit</button>
+        </div>
+      </form>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.3/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/limonte-sweetalert2/11.6.16/sweetalert2.all.min.js"></script>
+    <script>
+      $(document).ready(function () {
+        if (window.location.hash.includes('forgetPassword')) {
+          $('#container').html('')
+        }
+        $('#register').submit(function (e) {
+          e.preventDefault()
+          $.ajax({
+            url: '/account/register',
+            method: 'post',
+            dataType: 'json',
+            data: {
+              username: $('#username').val(),
+            },
+            beforeSend: function () {
+              $('#submit').attr('disabled', true)
+            },
+            complete: function () {
+              $('#submit').removeAttr('disabled')
+            },
+          }).then(function (response) {
+            Swal.fire('Info', response.message, response.retcode == 0 ? 'success' : 'error')
+          })
+        })
+      })
+    </script>
+  </body>
+</html>

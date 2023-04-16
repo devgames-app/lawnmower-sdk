@@ -1,0 +1,12 @@
+module.exports = {
+  port: 8080,
+  database: __dirname + '/../../data/hk4e.db',
+  region: [
+    {
+      name: '%DEFAULT_REGION%',
+      title: 'Development',
+      type: 'DEV_PUBLIC',
+      dispatchUrl: 'http://%EXT_IP%:10105/query_cur_region',
+    },
+  ],
+}
