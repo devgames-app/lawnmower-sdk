@@ -1,39 +1,40 @@
-const sqlite3 = require('sqlite3').verbose()
-const config = require('../config')
+const mysql = require("mysql");
+const config = require("../config");
 
-const db = new sqlite3.Database(config.database || ':memory:')
-
-const setup = () => {
-  db.serialize(() => {
-    let createTableAccounts = 'CREATE TABLE IF NOT EXISTS accounts (uid INTEGER PRIMARY KEY AUTOINCREMENT, username TEXT UNIQUE, token TEXT UNIQUE)'
-    db.run(createTableAccounts)
-  })
-}
+const pool = mysql.createPool({
+  connectionLimit: 10,
+  host: config.mysql.host,
+  user: config.mysql.user,
+  password: config.mysql.password,
+  database: config.mysql.database,
+});
 
 const get = (stmt, params) => {
-  return new Promise((res, rej) => {
-    db.get(stmt, params, (error, result) => {
+  return new Promise((resolve, reject) => {
+    pool.query(stmt, params, (error, results, fields) => {
       if (error) {
-        return rej(error.message)
+        return reject(error);
       }
-      return res(result)
-    })
-  })
-}
+      if (results.length === 0) {
+        return resolve(null);
+      }
+      return resolve(results[0]);
+    });
+  });
+};
 
 const run = (stmt, params) => {
-  return new Promise((res, rej) => {
-    db.run(stmt, params, (error, result) => {
+  return new Promise((resolve, reject) => {
+    pool.query(stmt, params, (error, results, fields) => {
       if (error) {
-        return rej(error.message)
+        return reject(error);
       }
-      return res(result)
-    })
-  })
-}
+      return resolve(results);
+    });
+  });
+};
 
 module.exports = {
-  setup,
   get,
   run,
-}
+};
